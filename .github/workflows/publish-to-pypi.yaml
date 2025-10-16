@@ -1,0 +1,61 @@
+on:
+  workflow_call:
+    inputs:
+      release-version:
+        type: string
+        required: true
+        description: Release version
+
+run-name: Publish python package to PyPI
+
+jobs:
+  publish-package:
+    runs-on: ubuntu-latest
+
+    environment: pypi
+
+    permissions:
+      contents: write  # to push version bump to git
+#      id-token: write  # mandatory for Trusted Publishing
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: master  # would be refs/tags/x.y.z otherwise
+
+      - uses: actions/checkout@v5
+        with:
+          repository: githuib/base
+          path: base
+
+      - name: Install Poetry
+        run: pipx install poetry==2.2.0
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          cache: poetry
+
+      - name: Run QA checks
+        run: |
+          poetry install --no-interaction --no-plugins
+          poetry run powerchord
+
+      - name: Setup git credentials
+        run: base/scripts/setup_git_creds_actions_bot.sh
+
+      - name: Bump package version
+        run: base/scripts/py__bump_package_version.sh
+        env:
+          RELEASE_VERSION: ${{ inputs.release-version }}
+
+      - name: Build package
+        run: |
+          poetry build --no-interaction --no-plugins
+
+      - name: Publish package to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          # Fallback to API token as 'Trusted Publishers' are
+          # currently not supported in reusable workflows.
+          password: ${{ secrets.PYPI_API_TOKEN }}
