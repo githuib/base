@@ -1,0 +1,35 @@
+on: workflow_call
+
+run-name: Build Poetry project into distributable package
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python - -y
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          cache: poetry
+
+      - name: Run QA checks
+        run: |
+          poetry install --no-interaction --no-plugins
+          poetry run powerchord
+
+      - name: Build package
+        run: |
+          poetry build --no-interaction --no-plugins
+
+      - name: Upload package
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
