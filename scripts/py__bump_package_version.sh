@@ -1,10 +1,10 @@
 #!/bin/bash
 
-version_or_rule="${1:-$RELEASE_VERSION}"
+version_or_rule="${*:1}"
 
-old_version="$(poetry version --short)"
-poetry version "$version_or_rule"
-new_version="$(poetry version --short)"
+old_version="$(uv version --short)"
+uv version "$version_or_rule"
+new_version="$(uv version --short)"
 
 if [[ "$old_version" == "$new_version" ]]; then
   echo "Version did not change: $new_version"
