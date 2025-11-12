@@ -1,9 +1,7 @@
 #!/bin/bash
 
-version_or_rule="${*:1}"
-
 old_version="$(uv version --short)"
-uv version "$version_or_rule"
+uv version "$@"
 new_version="$(uv version --short)"
 
 if [[ "$old_version" == "$new_version" ]]; then
@@ -12,7 +10,7 @@ if [[ "$old_version" == "$new_version" ]]; then
 fi
 
 git_push_pyproject () {
-  git add pyproject.toml
+  git add pyproject.toml uv.lock
   git commit -m "Bump version: $1 -> $2"
   git push
 }
