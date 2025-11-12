@@ -7,7 +7,7 @@ on:
 jobs:
   build:
     name: Build project into distributable package
-    uses: ./.github/workflows/py__build-uv-project.yml@master
+    uses: ./.github/workflows/py__build-uv-project.yml
 
   publish:
     name: Publish package to PyPI
