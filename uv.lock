@@ -2,34 +2,10 @@ version = 1
 revision = 3
 requires-python = ">=3.14"
 
-[manifest]
-members = [
-    "algo",
-    "based-utils",
-    "calc",
-    "cli",
-]
-
-[[package]]
-name = "algo"
-version = "0.2.0"
-source = { editable = "packages/algo" }
-
 [[package]]
 name = "based-utils"
 version = "0.2.1"
 source = { editable = "." }
-
-[package.optional-dependencies]
-algo = [
-    { name = "algo" },
-]
-calc = [
-    { name = "calc" },
-]
-cli = [
-    { name = "cli" },
-]
 
 [package.dev-dependencies]
 dev = [
@@ -41,12 +17,6 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [
-    { name = "algo", marker = "extra == 'algo'", editable = "packages/algo" },
-    { name = "calc", marker = "extra == 'calc'", editable = "packages/calc" },
-    { name = "cli", marker = "extra == 'cli'", editable = "packages/cli" },
-]
-provides-extras = ["algo", "calc", "cli"]
 
 [package.metadata.requires-dev]
 dev = [
@@ -56,11 +26,6 @@ dev = [
     { name = "pytest-asyncio" },
     { name = "ruff" },
 ]
-
-[[package]]
-name = "calc"
-version = "0.2.0"
-source = { editable = "packages/calc" }
 
 [[package]]
 name = "chili"
@@ -74,11 +39,6 @@ sdist = { url = "https://files.pythonhosted.org/packages/0f/e7/d8eb7703d81573760
 wheels = [
     { url = "https://files.pythonhosted.org/packages/9c/75/f6aa2f57d614404695c73ed1f394b5d79c22e11ed3a2c17cc34efb1d332a/chili-2.9.0-py3-none-any.whl", hash = "sha256:140cc82d3748227d6641334796b7b62afe41987dc821deb247e77bb9b2a9b7d7", size = 24166, upload-time = "2024-05-28T05:14:16.867Z" },
 ]
-
-[[package]]
-name = "cli"
-version = "0.2.0"
-source = { editable = "packages/cli" }
 
 [[package]]
 name = "colorama"

@@ -22,11 +22,6 @@ classifiers = [
 ]
 dependencies = []
 
-[project.optional-dependencies]
-algo = ["algo"]
-calc = ["calc"]
-cli = ["cli"]
-
 [dependency-groups]
 dev = [
     "mypy",
@@ -35,14 +30,6 @@ dev = [
     "pytest-asyncio",
     "ruff",
 ]
-
-[tool.uv.sources]
-algo = { workspace = true }
-calc = { workspace = true }
-cli = { workspace = true }
-
-[tool.uv.workspace]
-members = ["packages/*"]
 
 [project.urls]
 PyPI = "https://pypi.org/project/based-utils/"
