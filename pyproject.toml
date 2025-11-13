@@ -5,7 +5,7 @@ description = "Add your description here"
 authors = [
     { name = "Huib Piguillet", email = "huib@proton.me" }
 ]
-requires-python = ">=3.12"
+requires-python = ">=3.14"
 readme = "README.md"
 license = "MIT"
 keywords = [
@@ -22,6 +22,11 @@ classifiers = [
 ]
 dependencies = []
 
+[project.optional-dependencies]
+algo = ["algo"]
+calc = ["calc"]
+cli = ["cli"]
+
 [dependency-groups]
 dev = [
     "mypy",
@@ -30,6 +35,14 @@ dev = [
     "pytest-asyncio",
     "ruff",
 ]
+
+[tool.uv.sources]
+algo = { workspace = true }
+calc = { workspace = true }
+cli = { workspace = true }
+
+[tool.uv.workspace]
+members = ["packages/*"]
 
 [project.urls]
 PyPI = "https://pypi.org/project/based-utils/"
@@ -48,7 +61,7 @@ tasks = [
 ]
 
 [tool.mypy]
-files = ["src"] #, "tests"]
+files = ["src", "packages/*/src"] #, "tests"]
 implicit_optional = true
 warn_redundant_casts = true
 warn_unused_ignores = true
@@ -103,6 +116,10 @@ ignore = [
 "tests/**/*" = [
   "C901", #too complex
 ]
+
+[tool.ruff.lint.flake8-type-checking]
+#exempt-modules = []
+strict = true
 
 [tool.ruff.lint.isort]
 split-on-trailing-comma = false

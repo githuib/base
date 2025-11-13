@@ -1,5 +1,8 @@
-from collections.abc import Awaitable, Callable
 from time import perf_counter_ns
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Awaitable, Callable
 
 
 def timed[T](func: Callable[[], T]) -> tuple[T, int]:
@@ -10,6 +13,7 @@ def timed[T](func: Callable[[], T]) -> tuple[T, int]:
 
 def timed_awaitable[T](awaitable: Awaitable[T]) -> Awaitable[tuple[T, int]]:
     """Measure the runtime of an awaitable."""
+
     async def wrapper() -> tuple[T, int]:
         start = perf_counter_ns()
         return await awaitable, perf_counter_ns() - start
