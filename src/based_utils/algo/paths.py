@@ -183,7 +183,8 @@ class State[C, V: Hashable](Hashable, ABC):
     def __eq__(self, other: object) -> bool:
         if isinstance(other, State):
             return self.v == other.v
-            # return hash(self) == hash(other)
+            # Not sure why comparing the hashes doesn't work
+            # for some cases: return hash(self) == hash(other)
         return NotImplemented
 
 

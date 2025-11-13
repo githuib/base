@@ -1,6 +1,6 @@
 [project]
 name = "based-utils"
-version = "0.2.4"
+version = "0.2.5"
 description = "Add your description here"
 authors = [
     { name = "Huib Piguillet", email = "huib@proton.me" }
@@ -48,7 +48,7 @@ tasks = [
 ]
 
 [tool.mypy]
-files = ["src", "packages/*/src"] #, "tests"]
+files = ["src"] #, "tests"]
 implicit_optional = true
 warn_redundant_casts = true
 warn_unused_ignores = true
