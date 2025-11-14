@@ -28,12 +28,10 @@ class ShortestPath[S: State](ABC):
         return self._end_state
 
     @abstractmethod
-    def _states_to_explore(self) -> Iterator[S]:
-        pass
+    def _states_to_explore(self) -> Iterator[S]: ...
 
     @abstractmethod
-    def _mark_as_state_to_explore(self, state: S) -> None:
-        pass
+    def _mark_as_state_to_explore(self, state: S) -> None: ...
 
     def find(self) -> Self:
         state = self.begin_state
@@ -60,12 +58,10 @@ class ShortestPath[S: State](ABC):
         raise NoPathFoundError
 
     @abstractmethod
-    def _after_state_explored(self, state: S) -> None:
-        pass
+    def _after_state_explored(self, state: S) -> None: ...
 
     @abstractmethod
-    def _should_visit_state(self, state: S) -> bool:
-        pass
+    def _should_visit_state(self, state: S) -> bool: ...
 
     @property
     def states(self) -> Iterator[S]:

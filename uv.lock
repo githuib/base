@@ -6,6 +6,9 @@ requires-python = ">=3.14"
 name = "based-utils"
 version = "0.2.6"
 source = { editable = "." }
+dependencies = [
+    { name = "gaffe" },
+]
 
 [package.dev-dependencies]
 dev = [
@@ -17,6 +20,7 @@ dev = [
 ]
 
 [package.metadata]
+requires-dist = [{ name = "gaffe" }]
 
 [package.metadata.requires-dev]
 dev = [
