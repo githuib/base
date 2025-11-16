@@ -59,7 +59,6 @@ class LogMeister:
         logger.setLevel(level)
         for handler in handlers:
             logger.addHandler(handler)
-        logger.propagate = False
 
     @contextmanager
     def context(self, main_level: LogLevel, **levels: LogLevel) -> Iterator[None]:

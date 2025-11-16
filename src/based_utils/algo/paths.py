@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from collections import deque
 from collections.abc import Hashable
-from functools import cached_property
+from functools import cached_property, total_ordering
 from queue import PriorityQueue
 from typing import TYPE_CHECKING, ClassVar, Self
 
@@ -188,6 +188,7 @@ class BFSState[C, V: Hashable](State[C, V], ABC):
     path_finder_cls = ShortestPathBFS
 
 
+@total_ordering
 class DijkstraState[C, V: Hashable](State[C, V], ABC):
     path_finder_cls = ShortestPathDijkstra
 

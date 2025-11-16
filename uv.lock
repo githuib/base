@@ -8,6 +8,7 @@ version = "0.3.1"
 source = { editable = "." }
 dependencies = [
     { name = "gaffe" },
+    { name = "hsluv" },
 ]
 
 [package.dev-dependencies]
@@ -20,7 +21,10 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "gaffe" }]
+requires-dist = [
+    { name = "gaffe" },
+    { name = "hsluv" },
+]
 
 [package.metadata.requires-dev]
 dev = [
@@ -60,6 +64,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/df/63/f6903f5c1bd0472e1fa842ae89514cbd527cf8e11d8f60b5eff70c29637e/gaffe-0.3.0.tar.gz", hash = "sha256:1c09015fc8ff0343e8c94e37cfc4d24b92dd6c2e0e7cba87bea210eeab68ee3f", size = 5110, upload-time = "2023-11-08T05:09:43.688Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/64/25/59fb4e2b53f5755d8123e703500e2705865adb6713694fefd6014d7becb2/gaffe-0.3.0-py3-none-any.whl", hash = "sha256:fce5ad7cc5b2b6596775220db88ad54767cb32e5d589dfe1ca356ae7dc5c15e9", size = 5838, upload-time = "2023-11-08T05:09:42.141Z" },
+]
+
+[[package]]
+name = "hsluv"
+version = "5.0.4"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/ac/81/af16607fa045724e515579d312577261b436f36f419e7c677e7e88fcc943/hsluv-5.0.4.tar.gz", hash = "sha256:2281f946427a882010042844a38c7bbe9e0d0aaf9d46babe46366ed6f169b72e", size = 543090, upload-time = "2023-09-11T21:46:52.022Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/96/36/5bddefea3d7adf22a64f9aa9701492f8a9fe6948223f5cf2602c22ec9be7/hsluv-5.0.4-py2.py3-none-any.whl", hash = "sha256:0138bd10038e2ee1b13eecae9a7d49d4ec8c320b1d7eb4f860832c792e3e4567", size = 5252, upload-time = "2023-09-11T21:46:50.407Z" },
 ]
 
 [[package]]
