@@ -1,5 +1,6 @@
-import math
 from functools import cached_property
+
+from .constants import FULL_CIRCLE
 
 
 def trim(n: float, lower: float, upper: float) -> float:
@@ -27,7 +28,8 @@ class Bounds:
 
 
 class CyclicBounds(Bounds):
-    def __init__(self, begin: float, end: float, period: float = math.pi * 2) -> None:
+    def __init__(self, begin: float, end: float, period: float = None) -> None:
+        period = period or FULL_CIRCLE
         begin, end = begin % period, end % period
 
         # To ensure interpolation over the smallest angle,

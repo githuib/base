@@ -5,6 +5,8 @@ from typing import TYPE_CHECKING, overload
 
 from hsluv import hex_to_hsluv, hsluv_to_hex, hsluv_to_rgb, rgb_to_hsluv
 
+from based_utils.calx import RADIANS_TO_DEGREES
+
 if TYPE_CHECKING:
     from collections.abc import Iterator
 
@@ -16,14 +18,15 @@ class RGB:
     blue: int
 
 
-RADIANS_TO_DEGREES = 180 / math.pi
-
-
 @dataclass(frozen=True, order=True)
 class HSLuv:
     lightness: float  # 0 - 1 (ratio)
     saturation: float  # 0 - 1 (ratio)
     hue: float  # 0 - 2pi (angle)
+
+    def __repr__(self) -> str:
+        h, s, li = self.hsluv_tuple
+        return f"HSLuv(hue={h:.2f}°, saturation={s:.2f}%, lightness={li:.2f}%)"
 
     @classmethod
     def from_hsluv_tuple(cls, hsluv: tuple[float, float, float]) -> HSLuv:
