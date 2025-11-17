@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from functools import cached_property
+from typing import overload
 
 from hsluv import hex_to_hsluv, hsluv_to_hex, hsluv_to_rgb, rgb_to_hsluv
 
@@ -68,6 +69,14 @@ class HSLuv:
         """
         return HSLuv(self.lightness, self.saturation, (self.hue + 180) % 360)
 
+    @overload
+    @classmethod
+    def from_hex(cls, rgb_hex: str) -> HSLuv: ...
+
+    @overload
+    @classmethod
+    def from_hex(cls, rgb_hex: None) -> None: ...
+
     @classmethod
     def from_hex(cls, rgb_hex: str | None) -> HSLuv | None:
         """
@@ -119,6 +128,14 @@ class HSLuv:
     @cached_property
     def hex(self) -> str:
         return hsluv_to_hex((self.hue, self.saturation, self.lightness))[1:]
+
+    @overload
+    @classmethod
+    def from_rgb(cls, rgb: RGB) -> HSLuv: ...
+
+    @overload
+    @classmethod
+    def from_rgb(cls, rgb: None) -> None: ...
 
     @classmethod
     def from_rgb(cls, rgb: RGB | None) -> HSLuv | None:
