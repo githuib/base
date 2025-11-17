@@ -1,6 +1,40 @@
 from functools import cached_property
+from typing import TYPE_CHECKING
 
 from .constants import FULL_CIRCLE
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
+
+def frange(n: int, *, inclusive: bool = False) -> Iterator[float]:
+    """
+    Generate a range of n fractions from 0 to 1.
+
+    :param n: amount of numbers generated
+    :param inclusive: do we want to include 0 and 1 or not?
+    :return: generated numbers
+
+    >>> list(frange(0))
+    []
+    >>> list(frange(0, inclusive=True))
+    [0, 1]
+    >>> list(frange(1))
+    [0.5]
+    >>> list(frange(1, inclusive=True))
+    [0, 0.5, 1]
+    >>> list(frange(7))
+    [0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875]
+    >>> list(frange(7, inclusive=True))
+    [0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1]
+    """
+    end = n + 1
+    if inclusive:
+        yield 0
+    for i in range(1, end):
+        yield i / end
+    if inclusive:
+        yield 1
 
 
 def trim(n: float, lower: float, upper: float) -> float:

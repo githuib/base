@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, overload
 
 from hsluv import hex_to_hsluv, hsluv_to_hex, hsluv_to_rgb, rgb_to_hsluv
 
-from based_utils.calx import RADIANS_TO_DEGREES
+from .calx import RADIANS_TO_DEGREES, frange
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -197,13 +197,9 @@ class HSLuv:
         :return: iterator of shades
 
         >>> [c.hex for c in HSLuv.from_hex("08f").shades(5)]
-        ['002955', '004e97', '0076e0', '6ca2ff']
+        ['002955', '004e97', '0076e0', '6ca2ff', 'bccfff']
         >>> [c.hex for c in HSLuv.from_hex("08f").shades(5, inclusive=True)]
-        ['000000', '002955', '004e97', '0076e0', '6ca2ff', 'ffffff']
+        ['000000', '002955', '004e97', '0076e0', '6ca2ff', 'bccfff', 'ffffff']
         """
-        if inclusive:
-            yield self.shade(0)
-        for i in range(1, n):
-            yield self.shade(i / (n + 1))
-        if inclusive:
-            yield self.shade(1)
+        for lightness in frange(n, inclusive=inclusive):
+            yield self.shade(lightness)
