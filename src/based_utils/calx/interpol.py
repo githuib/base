@@ -119,7 +119,7 @@ def frange(
     inclusive: bool = False,
 ) -> Iterator[float]:
     """
-    Generate a range of numbers from start_to_end - end (or 0 - start_to_end) in the given step size.
+    Generate a range of numbers within the given range increasing with the given step.
 
     :param step: difference between two successive numbers in the range
     :param start_or_end: start of range (or end of range, if end not given)
@@ -166,19 +166,21 @@ def frange(
     """
     if not step:
         raise ValueError(step)
+    s: float
+    e: float
     if end is None:
-        start, end = 0, start_or_end or 1
+        s, e = 0, start_or_end or 1
     else:
-        start, end = start_or_end or 0, end
+        s, e = start_or_end or 0, end
 
     if inclusive:
-        yield start
-    n = start + step
-    while n < end and not isclose(n, end):
+        yield s
+    n = s + step
+    while n < e and not isclose(n, e):
         yield n
         n += step
     if inclusive:
-        yield end
+        yield e
 
 
 def fractions(n: int, *, inclusive: bool = False) -> Iterator[float]:
