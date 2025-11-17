@@ -1,8 +1,12 @@
+import math
 from dataclasses import dataclass
 from functools import cached_property
-from typing import overload
+from typing import TYPE_CHECKING, overload
 
 from hsluv import hex_to_hsluv, hsluv_to_hex, hsluv_to_rgb, rgb_to_hsluv
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
 
 
 @dataclass(frozen=True)
@@ -12,62 +16,27 @@ class RGB:
     blue: int
 
 
+RADIANS_TO_DEGREES = 180 / math.pi
+
+
 @dataclass(frozen=True, order=True)
 class HSLuv:
-    lightness: float
-    saturation: float
-    hue: float
+    lightness: float  # 0 - 1 (ratio)
+    saturation: float  # 0 - 1 (ratio)
+    hue: float  # 0 - 2pi (angle)
+
+    @classmethod
+    def from_hsluv_tuple(cls, hsluv: tuple[float, float, float]) -> HSLuv:
+        hue, saturation, lightness = hsluv
+        return HSLuv(lightness / 100, saturation / 100, hue / RADIANS_TO_DEGREES)
 
     @cached_property
-    def contrasting_shade(self) -> HSLuv:
-        """
-        Color with a lightness that contrasts with the current color.
-
-        Color with a 50% lower or higher lightness than the current color,
-        while maintaining the same hue and saturation (so it can for example
-        be used as background color).
-
-        :return: HSLuv representation of the contrasting shade
-
-        >>> HSLuv.from_hex("08f").contrasting_shade.hex
-        '001531'
-        >>> HSLuv.from_hex("0f8").contrasting_shade.hex
-        '006935'
-        >>> HSLuv.from_hex("80f").contrasting_shade.hex
-        'ebe4ff'
-        >>> HSLuv.from_hex("8f0").contrasting_shade.hex
-        '366b00'
-        >>> HSLuv.from_hex("f08").contrasting_shade.hex
-        '2b0012'
-        >>> HSLuv.from_hex("f80").contrasting_shade.hex
-        '4a2300'
-        """
-        return HSLuv((self.lightness + 50) % 100, self.saturation, self.hue)
-
-    @cached_property
-    def contrasting_hue(self) -> HSLuv:
-        """
-        Color with a hue that contrasts with the current color.
-
-        Color with a 180° different hue than the current color,
-        while maintaining the same saturation and perceived lightness.
-
-        :return: HSLuv representation of the contrasting hue
-
-        >>> HSLuv.from_hex("08f").contrasting_hue.hex
-        '9c8900'
-        >>> HSLuv.from_hex("0f8").contrasting_hue.hex
-        'ffd1f5'
-        >>> HSLuv.from_hex("80f").contrasting_hue.hex
-        '5c6900'
-        >>> HSLuv.from_hex("8f0").contrasting_hue.hex
-        'f6d9ff'
-        >>> HSLuv.from_hex("f08").contrasting_hue.hex
-        '009583'
-        >>> HSLuv.from_hex("f80").contrasting_hue.hex
-        '00b8d1'
-        """
-        return HSLuv(self.lightness, self.saturation, (self.hue + 180) % 360)
+    def hsluv_tuple(self) -> tuple[float, float, float]:
+        return (
+            self.hue * RADIANS_TO_DEGREES,
+            self.saturation * 100,
+            self.lightness * 100,
+        )
 
     @overload
     @classmethod
@@ -122,12 +91,11 @@ class HSLuv:
         else:
             raise ValueError(rgb_hex)
 
-        h, s, li = hex_to_hsluv(f"#{r}{g}{b}")
-        return HSLuv(li, s, h)
+        return HSLuv.from_hsluv_tuple(hex_to_hsluv(f"#{r}{g}{b}"))
 
     @cached_property
     def hex(self) -> str:
-        return hsluv_to_hex((self.hue, self.saturation, self.lightness))[1:]
+        return hsluv_to_hex(self.hsluv_tuple)[1:]
 
     @overload
     @classmethod
@@ -152,10 +120,87 @@ class HSLuv:
         """
         if rgb is None:
             return None
-        h, s, li = rgb_to_hsluv((rgb.red / 255, rgb.green / 255, rgb.blue / 255))
-        return HSLuv(li, s, h)
+        return HSLuv.from_hsluv_tuple(
+            rgb_to_hsluv((rgb.red / 255, rgb.green / 255, rgb.blue / 255))
+        )
 
     @cached_property
     def rgb(self) -> RGB:
-        r, g, b = hsluv_to_rgb((self.hue, self.saturation, self.lightness))
+        r, g, b = hsluv_to_rgb(self.hsluv_tuple)
         return RGB(int(r * 255), int(g * 255), int(b * 255))
+
+    @cached_property
+    def contrasting_shade(self) -> HSLuv:
+        """
+        Color with a lightness that contrasts with the current color.
+
+        Color with a 50% lower or higher lightness than the current color,
+        while maintaining the same hue and saturation (so it can for example
+        be used as background color).
+
+        :return: HSLuv representation of the contrasting shade
+
+        >>> HSLuv.from_hex("08f").contrasting_shade.hex
+        '001531'
+        >>> HSLuv.from_hex("0f8").contrasting_shade.hex
+        '006935'
+        >>> HSLuv.from_hex("80f").contrasting_shade.hex
+        'ebe4ff'
+        >>> HSLuv.from_hex("8f0").contrasting_shade.hex
+        '366b00'
+        >>> HSLuv.from_hex("f08").contrasting_shade.hex
+        '2b0012'
+        >>> HSLuv.from_hex("f80").contrasting_shade.hex
+        '4a2300'
+        """
+        return HSLuv((self.lightness + 0.5) % 1.0, self.saturation, self.hue)
+
+    @cached_property
+    def contrasting_hue(self) -> HSLuv:
+        """
+        Color with a hue that contrasts with the current color.
+
+        Color with a 180° different hue than the current color,
+        while maintaining the same saturation and perceived lightness.
+
+        :return: HSLuv representation of the contrasting hue
+
+        >>> HSLuv.from_hex("08f").contrasting_hue.hex
+        '9c8900'
+        >>> HSLuv.from_hex("0f8").contrasting_hue.hex
+        'ffd1f5'
+        >>> HSLuv.from_hex("80f").contrasting_hue.hex
+        '5c6900'
+        >>> HSLuv.from_hex("8f0").contrasting_hue.hex
+        'f6d9ff'
+        >>> HSLuv.from_hex("f08").contrasting_hue.hex
+        '009583'
+        >>> HSLuv.from_hex("f80").contrasting_hue.hex
+        '00b8d1'
+        """
+        return HSLuv(
+            self.lightness, self.saturation, (self.hue + math.pi) % (math.pi * 2)
+        )
+
+    def shade(self, lightness: float) -> HSLuv:
+        return HSLuv(lightness, self.saturation, self.hue)
+
+    def shades(self, n: int, *, inclusive: bool = False) -> Iterator[HSLuv]:
+        """
+        Generate n shades of this color.
+
+        :param n: amount of shades generated
+        :param inclusive: if we want to include 0 and 1 or not
+        :return: iterator of shades
+
+        >>> [c.hex for c in HSLuv.from_hex("08f").shades(5)]
+        ['002955', '004e97', '0076e0', '6ca2ff']
+        >>> [c.hex for c in HSLuv.from_hex("08f").shades(5, inclusive=True)]
+        ['000000', '002955', '004e97', '0076e0', '6ca2ff', 'ffffff']
+        """
+        if inclusive:
+            yield self.shade(0)
+        for i in range(1, n):
+            yield self.shade(i / (n + 1))
+        if inclusive:
+            yield self.shade(1)
