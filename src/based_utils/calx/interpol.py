@@ -13,20 +13,20 @@ def trim(n: float, lower: float = 0, upper: float = 1) -> float:
 
 
 class InterpolationBounds:
-    def __init__(self, begin: float = 0, end: float = 1) -> None:
-        self._begin = begin
+    def __init__(self, start: float = 0, end: float = 1) -> None:
+        self._start = start
         self._end = end
 
     @cached_property
     def _span(self) -> float:
-        return self._end - self._begin
+        return self._end - self._start
 
     def interpolate(self, f: float) -> float:
-        return self._begin + self._span * f
+        return self._start + self._span * f
 
     def inverse_interpolate(self, n: float, *, inside: bool = True) -> float:
         try:
-            f = (n - self._begin) / self._span
+            f = (n - self._start) / self._span
         except ZeroDivisionError:
             return 0.0
         return trim(f, 0.0, 1.0) if inside else f
@@ -34,31 +34,31 @@ class InterpolationBounds:
 
 class CyclicInterpolationBounds(InterpolationBounds):
     def __init__(
-        self, begin: float = 0, end: float = None, period: float = None
+        self, start: float = 0, end: float = None, period: float = None
     ) -> None:
         if end is None:
             end = FULL_CIRCLE
         if period is None:
             period = FULL_CIRCLE
-        begin, end = begin % period, end % period
+        start, end = start % period, end % period
 
         # To ensure interpolation over the smallest angle,
-        # phase shift {begin} over whole periods, such that the
-        # (absolute) difference between {begin} <-> {end} <= 1/2 {period}.
+        # phase shift {start} over whole periods, such that the
+        # (absolute) difference between {start} <-> {end} <= 1/2 {period}.
         #
         #                          v------ period ------v
         #    -1                    0                    1                    2
-        #     |                    |                    |     begin < end:   |
+        #     |                    |                    |     start < end:   |
         # Old:|                    |   B ~~~~~~~~~> E   |                    |
         # New:|                    |                E <~|~~ B' = B + period  |
-        #     |    begin > end:    |                    |                    |
+        #     |    start > end:    |                    |                    |
         # Old:|                    |   E <~~~~~~~~~ B   |                    |
         # New:|  B - period =  B'~~|~> E                |                    |
 
-        if abs(end - begin) > period / 2:
-            begin += period if begin < end else -period
+        if abs(end - start) > period / 2:
+            start += period if start < end else -period
 
-        super().__init__(begin, end)
+        super().__init__(start, end)
         self._period = period
 
     def interpolate(self, f: float) -> float:
@@ -68,34 +68,34 @@ class CyclicInterpolationBounds(InterpolationBounds):
         return super().inverse_interpolate(n % self._period, inside=inside)
 
 
-def interpolate(f: float, *, begin: float = 0, end: float = 1) -> float:
-    bounds = InterpolationBounds(begin, end)
+def interpolate(f: float, *, start: float = 0, end: float = 1) -> float:
+    bounds = InterpolationBounds(start, end)
     return bounds.interpolate(f)
 
 
 def inverse_interpolate(
-    n: float, *, begin: float = 0, end: float = 1, inside: bool = True
+    n: float, *, start: float = 0, end: float = 1, inside: bool = True
 ) -> float:
-    bounds = InterpolationBounds(begin, end)
+    bounds = InterpolationBounds(start, end)
     return bounds.inverse_interpolate(n, inside=inside)
 
 
 def interpolate_cyclic(
-    f: float, *, begin: float = 0, end: float = None, period: float = None
+    f: float, *, start: float = 0, end: float = None, period: float = None
 ) -> float:
-    bounds = CyclicInterpolationBounds(begin, end, period)
+    bounds = CyclicInterpolationBounds(start, end, period)
     return bounds.interpolate(f)
 
 
 def inverse_interpolate_cyclic(
     n: float,
     *,
-    begin: float = 0,
+    start: float = 0,
     end: float = None,
     period: float = None,
     inside: bool = True,
 ) -> float:
-    bounds = CyclicInterpolationBounds(begin, end, period)
+    bounds = CyclicInterpolationBounds(start, end, period)
     return bounds.inverse_interpolate(n, inside=inside)
 
 
