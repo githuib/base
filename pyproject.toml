@@ -42,7 +42,7 @@ build-backend = "uv_build"
 [tool.powerchord]
 tasks = [
     "mypy",
-#    "pytest",
+    "pytest",
     "ruff check",
 #    "ruff format",
 ]
@@ -98,6 +98,10 @@ ignore = [
 
   # flake8-pyi (PYI)
   "PYI025", # https://docs.astral.sh/ruff/rules/unaliased-collections-abc-set-import/	Use from collections.abc import Set as AbstractSet to avoid confusion with the set builtin
+
+  # Pylint (PL)
+  # Refactor (PLR)
+  "PLR2004", # https://docs.astral.sh/ruff/rules/magic-value-comparison/	Magic value used in comparison, consider replacing {value} with a constant variable
 
   # Ruff-specific rules (RUF)
   "RUF013", # https://docs.astral.sh/ruff/rules/implicit-optional/	PEP 484 prohibits implicit Optional

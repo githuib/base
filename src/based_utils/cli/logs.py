@@ -65,14 +65,14 @@ class LogMeister:
         """
         Context manager to activate logging queues.
 
-        >>> log = LogMeister("my-app", LogLevel.INFO, warnings=LogLevel.WARNING)
+        >>> log = LogMeister("my-app")
         >>> def foo():
-        >>>     log.get_logger("warnings").warning("Shouldn't log yet.")
-        >>>     with log.context():
-        >>>         log.get_logger().info("This should show up.")
-        >>>         log.get_logger("warnings").warning("...this as well.")
-        >>>         log.get_logger("warnings").info("...but INFO shouldn't.")
-        >>>     log.get_logger("warnings").warning("Shouldn't log anymore.")
+        ...     log.get_logger("warnings").warning("Shouldn't log yet.")
+        ...     with log.context(LogLevel.INFO, warnings=LogLevel.WARNING):
+        ...         log.get_logger().info("This should show up.")
+        ...         log.get_logger("warnings").warning("...this as well.")
+        ...         log.get_logger("warnings").info("...but INFO shouldn't.")
+        ...     log.get_logger("warnings").warning("Shouldn't log anymore.")
         """
         self._setup_logger(*self._console_handlers, level=main_level)
 
