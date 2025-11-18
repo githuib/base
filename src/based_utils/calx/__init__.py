@@ -12,6 +12,7 @@ from .interpol import (
     inverse_interpolate_cyclic,
     trim,
 )
+from .utils import randf
 
 __all__ = [
     "FULL_CIRCLE",
@@ -27,5 +28,6 @@ __all__ = [
     "inverse_interpolate",
     "inverse_interpolate_angle",
     "inverse_interpolate_cyclic",
+    "randf",
     "trim",
 ]
