@@ -1,11 +1,10 @@
-import math
 from dataclasses import dataclass
 from functools import cached_property
 from typing import TYPE_CHECKING, overload
 
 from hsluv import hex_to_hsluv, hsluv_to_hex, hsluv_to_rgb, rgb_to_hsluv
 
-from .calx import RADIANS_TO_DEGREES, fractions
+from .calx import fractions, trim
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -22,24 +21,42 @@ class RGB:
 class HSLuv:
     lightness: float  # 0 - 1 (ratio)
     saturation: float  # 0 - 1 (ratio)
-    hue: float  # 0 - 2pi (angle)
+    hue: float  # 0 - 1 (full circle angle)
 
     def __repr__(self) -> str:
         h, s, li = self.hsluv_tuple
         return f"HSLuv(hue={h:.2f}°, saturation={s:.2f}%, lightness={li:.2f}%)"
 
     @classmethod
+    def from_fields(cls, lightness: float, saturation: float, hue: float) -> HSLuv:
+        return cls(trim(lightness), trim(saturation), hue % 1)
+
+    def copy(
+        self, *, lightness: float = None, saturation: float = None, hue: float = None
+    ) -> HSLuv:
+        return HSLuv.from_fields(
+            self.lightness if lightness is None else lightness,
+            self.saturation if saturation is None else saturation,
+            self.hue if hue is None else hue,
+        )
+
+    def relative_copy(
+        self, *, lightness: float = None, saturation: float = None, hue: float = None
+    ) -> HSLuv:
+        return HSLuv.from_fields(
+            self.lightness * (1 if lightness is None else lightness),
+            self.saturation * (1 if saturation is None else saturation),
+            self.hue + (0 if hue is None else hue),
+        )
+
+    @classmethod
     def from_hsluv_tuple(cls, hsluv: tuple[float, float, float]) -> HSLuv:
         hue, saturation, lightness = hsluv
-        return HSLuv(lightness / 100, saturation / 100, hue / RADIANS_TO_DEGREES)
+        return HSLuv(lightness / 100, saturation / 100, hue / 360)
 
     @cached_property
     def hsluv_tuple(self) -> tuple[float, float, float]:
-        return (
-            self.hue * RADIANS_TO_DEGREES,
-            self.saturation * 100,
-            self.lightness * 100,
-        )
+        return self.hue * 360, self.saturation * 100, self.lightness * 100
 
     @overload
     @classmethod
@@ -156,7 +173,7 @@ class HSLuv:
         >>> HSLuv.from_hex("f80").contrasting_shade.hex
         '4a2300'
         """
-        return HSLuv((self.lightness + 0.5) % 1.0, self.saturation, self.hue)
+        return self.copy(lightness=(self.lightness + 0.5) % 1)
 
     @cached_property
     def contrasting_hue(self) -> HSLuv:
@@ -181,12 +198,10 @@ class HSLuv:
         >>> HSLuv.from_hex("f80").contrasting_hue.hex
         '00b8d1'
         """
-        return HSLuv(
-            self.lightness, self.saturation, (self.hue + math.pi) % (math.pi * 2)
-        )
+        return self.relative_copy(hue=0.5)
 
     def shade(self, lightness: float) -> HSLuv:
-        return HSLuv(lightness, self.saturation, self.hue)
+        return self.copy(lightness=lightness)
 
     def shades(self, n: int, *, inclusive: bool = False) -> Iterator[HSLuv]:
         """
