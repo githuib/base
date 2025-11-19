@@ -21,7 +21,7 @@ ColorName = Literal[
     "purple",
     "pink",
 ]
-_names: list[ColorName] = [
+color_names: list[ColorName] = [
     "red",
     "orange",
     "yellow",
@@ -41,8 +41,10 @@ _names: list[ColorName] = [
 # 1, 5, 10, 14, 17, 24, 32, 35, 37, 44 / 48
 # = 0.75, 3.75, 7.5, 10.5, 12.75, 18, 24, 26.25, 27.75, 33 / 36
 _HUES = {
-    name: (h + 0.5) / 36
-    for name, h in zip(_names, [0, 3, 6, 10, 13, 21, 24, 26, 27, 33], strict=True)
+    name: h / 360
+    for name, h in zip(
+        color_names, [10, 38, 76, 100, 130, 186, 242, 268, 280, 325], strict=True
+    )
 }
 
 
