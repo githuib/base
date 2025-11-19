@@ -153,16 +153,16 @@ wheels = [
 
 [[package]]
 name = "powerchord"
-version = "0.2.16"
+version = "0.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "based-utils" },
     { name = "chili" },
     { name = "gaffe" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/94/fd/4e1e295d2bfdc9b9f0e158be16493c89a08de87d3975e68dba3c9b3259c8/powerchord-0.2.16.tar.gz", hash = "sha256:278aa07b7b88a9ed106844c18c15beb1ebf9e6aac4b897cc8856b1bea85c7c0f", size = 6128, upload-time = "2025-11-14T17:52:19.202Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/1d/0e/c7a39eeb5e4d1e6c79bdcf4728ce742297c5a7f0873b68c4938ba09fbdb2/powerchord-0.3.0.tar.gz", hash = "sha256:572294353226e78d7195a5999adffc536455bb277973240a068463a4e01b7421", size = 5756, upload-time = "2025-11-19T20:56:04.258Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/84/34/be3a1aae4ff2471cbc11521fe22e86e398b15518e8a002c2985cffb66ff1/powerchord-0.2.16-py3-none-any.whl", hash = "sha256:7a7370afc1d2d85498eb9d035ebee9facea56a6e46424468180a5a5b3abab2bd", size = 7273, upload-time = "2025-11-14T17:52:17.993Z" },
+    { url = "https://files.pythonhosted.org/packages/48/d9/aa2f2e0ff9e636f4ebd1d5bd4608c1ab9d9838cbdbdbfabaf1309d54156e/powerchord-0.3.0-py3-none-any.whl", hash = "sha256:d89da51cfe59eeedc4d2f6b8a29d42244fe74079c7175193b68654485073d9f6", size = 6629, upload-time = "2025-11-19T20:56:03.124Z" },
 ]
 
 [[package]]
