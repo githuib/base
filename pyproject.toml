@@ -20,7 +20,11 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
     "Programming Language :: Python :: 3 :: Only",
 ]
-dependencies = ["gaffe", "hsluv"]
+dependencies = [
+    "gaffe",
+    "hsluv",
+    "yachalk",
+]
 
 [dependency-groups]
 dev = [
@@ -34,6 +38,9 @@ dev = [
 [project.urls]
 PyPI = "https://pypi.org/project/based-utils/"
 Github = "https://github.com/githuib/based-utils/"
+
+[project.scripts]
+colors = "based_utils.entry_points:print_colors"
 
 [build-system]
 requires = ["uv_build>=0.9.3,<0.10.0"]

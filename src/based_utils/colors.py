@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from functools import cached_property
-from typing import TYPE_CHECKING, Literal, overload
+from typing import TYPE_CHECKING, ClassVar, Literal, Self, TypedDict, overload
 
 from hsluv import hex_to_hsluv, hsluv_to_hex, hsluv_to_rgb, rgb_to_hsluv
 
@@ -8,6 +8,14 @@ from .calx import fractions, trim
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
+
+
+@dataclass(frozen=True)
+class RGB:
+    red: int
+    green: int
+    blue: int
+
 
 ColorName = Literal[
     "red",
@@ -21,7 +29,8 @@ ColorName = Literal[
     "purple",
     "pink",
 ]
-color_names: list[ColorName] = [
+
+colors: list[ColorName] = [
     "red",
     "orange",
     "yellow",
@@ -34,25 +43,47 @@ color_names: list[ColorName] = [
     "pink",
 ]
 
-# Alternatives:
-# 1, 3, 6, 8, 10, 14, 18, 20, 21, 23 / 27
-# 1, 4, 7, 9, 11, 16, 20, 22, 24, 27 / 30
-# 1, 5, 9, 12, 15, 21, 27, 29.5, 31, 37 / 40
-# 1, 5, 10, 14, 17, 24, 32, 35, 37, 44 / 48
-# = 0.75, 3.75, 7.5, 10.5, 12.75, 18, 24, 26.25, 27.75, 33 / 36
-_HUES = {
-    name: h / 360
-    for name, h in zip(
-        color_names, [10, 38, 76, 100, 130, 186, 242, 268, 280, 325], strict=True
-    )
-}
 
-
-@dataclass(frozen=True)
-class RGB:
+class Hues(TypedDict):
     red: int
+    orange: int
+    yellow: int
+    poison: int
     green: int
+    turquoise: int
     blue: int
+    indigo: int
+    purple: int
+    pink: int
+
+
+"""
+Highly opinionated (though carefully selected) color theme.
+
+Can be overridden by specifying a custom Color class with
+a different set of hues (in degrees):
+>>> my_hues: Hues = {
+...    "red": 9,
+...    "orange": 36,
+...    "yellow": 78,
+...    ...
+... }
+...
+... class MyColor(Color):
+...     hues = my_hues
+"""
+HUES: Hues = {
+    "red": 5,
+    "orange": 35,
+    "yellow": 76,
+    "poison": 100,
+    "green": 130,
+    "turquoise": 186,
+    "blue": 242,
+    "indigo": 268,
+    "purple": 280,
+    "pink": 325,
+}
 
 
 @dataclass(frozen=True, order=True)
@@ -61,6 +92,8 @@ class Color:
     saturation: float  # 0 - 1 (ratio)
     hue: float  # 0 - 1 (full circle angle)
 
+    hues: ClassVar[Hues] = HUES
+
     def __repr__(self) -> str:
         h, s, li = self.hsluv_tuple
         return f"Color(hue={h:.2f}°, saturation={s:.2f}%, lightness={li:.2f}%)"
@@ -68,13 +101,13 @@ class Color:
     @classmethod
     def from_fields(
         cls, *, lightness: float = 0.5, saturation: float = 1, hue: float = 0
-    ) -> Color:
+    ) -> Self:
         return cls(trim(lightness), trim(saturation), hue % 1)
 
     def but_with(
         self, *, lightness: float = None, saturation: float = None, hue: float = None
-    ) -> Color:
-        return Color.from_fields(
+    ) -> Self:
+        return self.__class__.from_fields(
             lightness=self.lightness if lightness is None else lightness,
             saturation=self.saturation if saturation is None else saturation,
             hue=self.hue if hue is None else hue,
@@ -82,7 +115,7 @@ class Color:
 
     def with_changed(
         self, *, lightness: float = None, saturation: float = None, hue: float = None
-    ) -> Color:
+    ) -> Self:
         return self.but_with(
             lightness=None if lightness is None else self.lightness * lightness,
             saturation=None if saturation is None else self.saturation * saturation,
@@ -92,19 +125,19 @@ class Color:
     @classmethod
     def from_name(
         cls, name: ColorName, *, lightness: float = 0.5, saturation: float = 1
-    ) -> Color:
-        return Color.from_fields(
-            lightness=lightness, saturation=saturation, hue=_HUES[name]
+    ) -> Self:
+        return cls.from_fields(
+            lightness=lightness, saturation=saturation, hue=cls.hues[name] / 360
         )
 
     @classmethod
-    def grey(cls, lightness: float = 0.5) -> Color:
-        return Color.from_fields(lightness=lightness, saturation=0)
+    def grey(cls, lightness: float = 0.5) -> Self:
+        return cls.from_fields(lightness=lightness, saturation=0)
 
     @classmethod
-    def from_hsluv_tuple(cls, hsluv: tuple[float, float, float]) -> Color:
+    def from_hsluv_tuple(cls, hsluv: tuple[float, float, float]) -> Self:
         hue, saturation, lightness = hsluv
-        return Color(lightness / 100, saturation / 100, hue / 360)
+        return cls(lightness / 100, saturation / 100, hue / 360)
 
     @cached_property
     def hsluv_tuple(self) -> tuple[float, float, float]:
@@ -112,14 +145,14 @@ class Color:
 
     @overload
     @classmethod
-    def from_hex(cls, rgb_hex: str) -> Color: ...
+    def from_hex(cls, rgb_hex: str) -> Self: ...
 
     @overload
     @classmethod
     def from_hex(cls, rgb_hex: None) -> None: ...
 
     @classmethod
-    def from_hex(cls, rgb_hex: str | None) -> Color | None:
+    def from_hex(cls, rgb_hex: str | None) -> Self | None:
         """
         Create a Color from an RGB hex string.
 
@@ -163,7 +196,7 @@ class Color:
         else:
             raise ValueError(rgb_hex)
 
-        return Color.from_hsluv_tuple(hex_to_hsluv(f"#{r}{g}{b}"))
+        return cls.from_hsluv_tuple(hex_to_hsluv(f"#{r}{g}{b}"))
 
     @cached_property
     def hex(self) -> str:
@@ -171,14 +204,14 @@ class Color:
 
     @overload
     @classmethod
-    def from_rgb(cls, rgb: RGB) -> Color: ...
+    def from_rgb(cls, rgb: RGB) -> Self: ...
 
     @overload
     @classmethod
     def from_rgb(cls, rgb: None) -> None: ...
 
     @classmethod
-    def from_rgb(cls, rgb: RGB | None) -> Color | None:
+    def from_rgb(cls, rgb: RGB | None) -> Self | None:
         """
         Create a Color from RGB values.
 
@@ -192,7 +225,7 @@ class Color:
         """
         if rgb is None:
             return None
-        return Color.from_hsluv_tuple(
+        return cls.from_hsluv_tuple(
             rgb_to_hsluv((rgb.red / 255, rgb.green / 255, rgb.blue / 255))
         )
 
@@ -202,7 +235,7 @@ class Color:
         return RGB(int(r * 255), int(g * 255), int(b * 255))
 
     @cached_property
-    def contrasting_shade(self) -> Color:
+    def contrasting_shade(self) -> Self:
         """
         Color with a lightness that contrasts with the current color.
 
@@ -228,7 +261,7 @@ class Color:
         return self.but_with(lightness=(self.lightness + 0.5) % 1)
 
     @cached_property
-    def contrasting_hue(self) -> Color:
+    def contrasting_hue(self) -> Self:
         """
         Color with a hue that contrasts with the current color.
 
@@ -252,7 +285,7 @@ class Color:
         """
         return self.with_changed(hue=0.5)
 
-    def shade(self, lightness: float) -> Color:
+    def shade(self, lightness: float) -> Self:
         return self.but_with(lightness=lightness)
 
     def shades(self, n: int, *, inclusive: bool = False) -> Iterator[Color]:
