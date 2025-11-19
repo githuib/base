@@ -23,7 +23,7 @@ ColorName = Literal[
     "yellow",
     "poison",
     "green",
-    "turquoise",
+    "ocean",
     "blue",
     "indigo",
     "purple",
@@ -36,7 +36,7 @@ colors: list[ColorName] = [
     "yellow",
     "poison",
     "green",
-    "turquoise",
+    "ocean",
     "blue",
     "indigo",
     "purple",
@@ -50,7 +50,7 @@ class Hues(TypedDict):
     yellow: int
     poison: int
     green: int
-    turquoise: int
+    ocean: int
     blue: int
     indigo: int
     purple: int
@@ -73,12 +73,12 @@ a different set of hues (in degrees):
 ...     hues = my_hues
 """
 HUES: Hues = {
-    "red": 5,
+    "red": 10,
     "orange": 35,
-    "yellow": 76,
+    "yellow": 75,
     "poison": 100,
-    "green": 130,
-    "turquoise": 186,
+    "green": 126,
+    "ocean": 184,
     "blue": 242,
     "indigo": 268,
     "purple": 280,

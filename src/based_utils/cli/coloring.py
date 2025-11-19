@@ -40,9 +40,9 @@ class Colored:
 
 
 def color_shades(c: Color) -> Iterator[str]:
-    for f in fractions(9):
+    for f in fractions(19):
         s = c.shade(f)
-        yield Colored(f" {f * 100:.0f}% ", s.contrasting_shade, s).formatted
+        yield Colored(f" {s.hex} ", s.contrasting_shade, s).formatted
 
 
 def color_line(c: Color, n: str = "") -> str:
@@ -54,7 +54,7 @@ def saturation_lines(saturation: float) -> Iterator[str]:
     if saturation == 0:
         yield color_line(Color.grey(), "grey")
     else:
-        yield ""
+        yield "".join(f"   {f * 100:.0f}%  " for f in fractions(19))
         for h in colors:
             yield color_line(Color.from_name(h, saturation=saturation), h)
 
