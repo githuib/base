@@ -112,11 +112,7 @@ def inverse_interpolate_angle(
 
 
 def frange(
-    step: float,
-    start_or_end: float = None,
-    end: float = None,
-    *,
-    inclusive: bool = False,
+    step: float, start_or_end: float = None, end: float = None
 ) -> Iterator[float]:
     """
     Generate a range of numbers within the given range increasing with the given step.
@@ -131,38 +127,26 @@ def frange(
     Traceback (most recent call last):
     ...
     ValueError: 0
-    >>> " ".join(f"{n:.2f}" for n in frange(0, inclusive=True))
-    Traceback (most recent call last):
-    ...
-    ValueError: 0
     >>> " ".join(f"{n:.3f}" for n in frange(1))
-    ''
-    >>> " ".join(f"{n:.3f}" for n in frange(1, inclusive=True))
-    '0.000 1.000'
+    '0.000'
     >>> " ".join(f"{n:.3f}" for n in frange(0.125))
-    '0.125 0.250 0.375 0.500 0.625 0.750 0.875'
-    >>> " ".join(f"{n:.3f}" for n in frange(0.125, inclusive=True))
-    '0.000 0.125 0.250 0.375 0.500 0.625 0.750 0.875 1.000'
+    '0.000 0.125 0.250 0.375 0.500 0.625 0.750 0.875'
     >>> " ".join(f"{n:.2f}" for n in frange(0.12))
-    '0.12 0.24 0.36 0.48 0.60 0.72 0.84 0.96'
-    >>> " ".join(f"{n:.2f}" for n in frange(0.12, inclusive=True))
-    '0.00 0.12 0.24 0.36 0.48 0.60 0.72 0.84 0.96 1.00'
+    '0.00 0.12 0.24 0.36 0.48 0.60 0.72 0.84 0.96'
     >>> " ".join(f"{n:.2f}" for n in frange(0.13))
-    '0.13 0.26 0.39 0.52 0.65 0.78 0.91'
-    >>> " ".join(f"{n:.2f}" for n in frange(0.13, inclusive=True))
-    '0.00 0.13 0.26 0.39 0.52 0.65 0.78 0.91 1.00'
+    '0.00 0.13 0.26 0.39 0.52 0.65 0.78 0.91'
     >>> " ".join(f"{n:.2f}" for n in frange(0.13, 0.51))
-    '0.13 0.26 0.39'
+    '0.00 0.13 0.26 0.39'
     >>> " ".join(f"{n:.2f}" for n in frange(0.13, 0.52))
-    '0.13 0.26 0.39'
+    '0.00 0.13 0.26 0.39'
     >>> " ".join(f"{n:.2f}" for n in frange(0.13, 0.53))
-    '0.13 0.26 0.39 0.52'
+    '0.00 0.13 0.26 0.39 0.52'
     >>> " ".join(f"{n:.2f}" for n in frange(1.13, -3.4, 4.50))
-    '-2.27 -1.14 -0.01 1.12 2.25 3.38'
+    '-3.40 -2.27 -1.14 -0.01 1.12 2.25 3.38'
     >>> " ".join(f"{n:.2f}" for n in frange(1.13, -3.4, 4.51))
-    '-2.27 -1.14 -0.01 1.12 2.25 3.38'
+    '-3.40 -2.27 -1.14 -0.01 1.12 2.25 3.38'
     >>> " ".join(f"{n:.2f}" for n in frange(1.13, -3.4, 4.52))
-    '-2.27 -1.14 -0.01 1.12 2.25 3.38 4.51'
+    '-3.40 -2.27 -1.14 -0.01 1.12 2.25 3.38 4.51'
     """
     if not step:
         raise ValueError(step)
@@ -173,14 +157,11 @@ def frange(
     else:
         s, e = start_or_end or 0, end
 
-    if inclusive:
-        yield s
+    yield s
     n = s + step
     while n < e and not isclose(n, e):
         yield n
         n += step
-    if inclusive:
-        yield e
 
 
 def fractions(n: int, *, inclusive: bool = False) -> Iterator[float]:
@@ -204,4 +185,10 @@ def fractions(n: int, *, inclusive: bool = False) -> Iterator[float]:
     >>> " ".join(f"{n:.3f}" for n in fractions(7, inclusive=True))
     '0.000 0.125 0.250 0.375 0.500 0.625 0.750 0.875 1.000'
     """
-    return frange(1 / (n + 1), inclusive=inclusive)
+    if inclusive:
+        yield 0
+    end = n + 1
+    for i in range(1, end):
+        yield i / end
+    if inclusive:
+        yield 1

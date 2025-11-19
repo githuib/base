@@ -12,7 +12,7 @@ from .interpol import (
     inverse_interpolate_cyclic,
     trim,
 )
-from .utils import randf
+from .utils import compare, mods, randf, solve_quadratic
 
 __all__ = [
     "FULL_CIRCLE",
@@ -20,6 +20,7 @@ __all__ = [
     "RADIANS_TO_DEGREES",
     "CyclicInterpolationBounds",
     "InterpolationBounds",
+    "compare",
     "fractions",
     "frange",
     "interpolate",
@@ -28,6 +29,8 @@ __all__ = [
     "inverse_interpolate",
     "inverse_interpolate_angle",
     "inverse_interpolate_cyclic",
+    "mods",
     "randf",
+    "solve_quadratic",
     "trim",
 ]

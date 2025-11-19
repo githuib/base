@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from functools import cached_property
-from typing import TYPE_CHECKING, overload
+from typing import TYPE_CHECKING, Literal, overload
 
 from hsluv import hex_to_hsluv, hsluv_to_hex, hsluv_to_rgb, rgb_to_hsluv
 
@@ -8,6 +8,42 @@ from .calx import fractions, trim
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
+
+ColorName = Literal[
+    "red",
+    "orange",
+    "yellow",
+    "poison",
+    "green",
+    "turquoise",
+    "blue",
+    "indigo",
+    "purple",
+    "pink",
+]
+_names: list[ColorName] = [
+    "red",
+    "orange",
+    "yellow",
+    "poison",
+    "green",
+    "turquoise",
+    "blue",
+    "indigo",
+    "purple",
+    "pink",
+]
+
+# Alternatives:
+# 1, 3, 6, 8, 10, 14, 18, 20, 21, 23 / 27
+# 1, 4, 7, 9, 11, 16, 20, 22, 24, 27 / 30
+# 1, 5, 9, 12, 15, 21, 27, 29.5, 31, 37 / 40
+# 1, 5, 10, 14, 17, 24, 32, 35, 37, 44 / 48
+# = 0.75, 3.75, 7.5, 10.5, 12.75, 18, 24, 26.25, 27.75, 33 / 36
+_HUES = {
+    name: (h + 0.5) / 36
+    for name, h in zip(_names, [0, 3, 6, 10, 13, 21, 24, 26, 27, 33], strict=True)
+}
 
 
 @dataclass(frozen=True)
@@ -18,41 +54,55 @@ class RGB:
 
 
 @dataclass(frozen=True, order=True)
-class HSLuv:
+class Color:
     lightness: float  # 0 - 1 (ratio)
     saturation: float  # 0 - 1 (ratio)
     hue: float  # 0 - 1 (full circle angle)
 
     def __repr__(self) -> str:
         h, s, li = self.hsluv_tuple
-        return f"HSLuv(hue={h:.2f}°, saturation={s:.2f}%, lightness={li:.2f}%)"
+        return f"Color(hue={h:.2f}°, saturation={s:.2f}%, lightness={li:.2f}%)"
 
     @classmethod
-    def from_fields(cls, lightness: float, saturation: float, hue: float) -> HSLuv:
+    def from_fields(
+        cls, *, lightness: float = 0.5, saturation: float = 1, hue: float = 0
+    ) -> Color:
         return cls(trim(lightness), trim(saturation), hue % 1)
 
-    def copy(
+    def but_with(
         self, *, lightness: float = None, saturation: float = None, hue: float = None
-    ) -> HSLuv:
-        return HSLuv.from_fields(
-            self.lightness if lightness is None else lightness,
-            self.saturation if saturation is None else saturation,
-            self.hue if hue is None else hue,
+    ) -> Color:
+        return Color.from_fields(
+            lightness=self.lightness if lightness is None else lightness,
+            saturation=self.saturation if saturation is None else saturation,
+            hue=self.hue if hue is None else hue,
         )
 
-    def relative_copy(
+    def with_changed(
         self, *, lightness: float = None, saturation: float = None, hue: float = None
-    ) -> HSLuv:
-        return HSLuv.from_fields(
-            self.lightness * (1 if lightness is None else lightness),
-            self.saturation * (1 if saturation is None else saturation),
-            self.hue + (0 if hue is None else hue),
+    ) -> Color:
+        return self.but_with(
+            lightness=None if lightness is None else self.lightness * lightness,
+            saturation=None if saturation is None else self.saturation * saturation,
+            hue=None if hue is None else (self.hue + hue),
         )
 
     @classmethod
-    def from_hsluv_tuple(cls, hsluv: tuple[float, float, float]) -> HSLuv:
+    def from_name(
+        cls, name: ColorName, *, lightness: float = 0.5, saturation: float = 1
+    ) -> Color:
+        return Color.from_fields(
+            lightness=lightness, saturation=saturation, hue=_HUES[name]
+        )
+
+    @classmethod
+    def grey(cls, lightness: float = 0.5) -> Color:
+        return Color.from_fields(lightness=lightness, saturation=0)
+
+    @classmethod
+    def from_hsluv_tuple(cls, hsluv: tuple[float, float, float]) -> Color:
         hue, saturation, lightness = hsluv
-        return HSLuv(lightness / 100, saturation / 100, hue / 360)
+        return Color(lightness / 100, saturation / 100, hue / 360)
 
     @cached_property
     def hsluv_tuple(self) -> tuple[float, float, float]:
@@ -60,29 +110,29 @@ class HSLuv:
 
     @overload
     @classmethod
-    def from_hex(cls, rgb_hex: str) -> HSLuv: ...
+    def from_hex(cls, rgb_hex: str) -> Color: ...
 
     @overload
     @classmethod
     def from_hex(cls, rgb_hex: None) -> None: ...
 
     @classmethod
-    def from_hex(cls, rgb_hex: str | None) -> HSLuv | None:
+    def from_hex(cls, rgb_hex: str | None) -> Color | None:
         """
-        Create a HSLuv from an RGB hex string.
+        Create a Color from an RGB hex string.
 
         :param rgb_hex: RGB hex string (may start with '#') or None
-        :return: HSLuv instance
+        :return: Color instance
 
-        >>> HSLuv.from_hex(None) is None
+        >>> Color.from_hex(None) is None
         True
-        >>> HSLuv.from_hex("3").hex
+        >>> Color.from_hex("3").hex
         '333333'
-        >>> HSLuv.from_hex("03").hex
+        >>> Color.from_hex("03").hex
         '030303'
-        >>> HSLuv.from_hex("303").hex
+        >>> Color.from_hex("303").hex
         '330033'
-        >>> HSLuv.from_hex("808303").hex
+        >>> Color.from_hex("808303").hex
         '808303'
         """
         if rgb_hex is None:
@@ -111,7 +161,7 @@ class HSLuv:
         else:
             raise ValueError(rgb_hex)
 
-        return HSLuv.from_hsluv_tuple(hex_to_hsluv(f"#{r}{g}{b}"))
+        return Color.from_hsluv_tuple(hex_to_hsluv(f"#{r}{g}{b}"))
 
     @cached_property
     def hex(self) -> str:
@@ -119,28 +169,28 @@ class HSLuv:
 
     @overload
     @classmethod
-    def from_rgb(cls, rgb: RGB) -> HSLuv: ...
+    def from_rgb(cls, rgb: RGB) -> Color: ...
 
     @overload
     @classmethod
     def from_rgb(cls, rgb: None) -> None: ...
 
     @classmethod
-    def from_rgb(cls, rgb: RGB | None) -> HSLuv | None:
+    def from_rgb(cls, rgb: RGB | None) -> Color | None:
         """
-        Create a HSLuv from RGB values.
+        Create a Color from RGB values.
 
         :param rgb: RGB instance or None
-        :return: HSLuv instance
+        :return: Color instance
 
-        >>> HSLuv.from_rgb(None) is None
+        >>> Color.from_rgb(None) is None
         True
-        >>> HSLuv.from_rgb(RGB(128, 131, 3)).rgb
+        >>> Color.from_rgb(RGB(128, 131, 3)).rgb
         RGB(red=127, green=131, blue=3)
         """
         if rgb is None:
             return None
-        return HSLuv.from_hsluv_tuple(
+        return Color.from_hsluv_tuple(
             rgb_to_hsluv((rgb.red / 255, rgb.green / 255, rgb.blue / 255))
         )
 
@@ -150,7 +200,7 @@ class HSLuv:
         return RGB(int(r * 255), int(g * 255), int(b * 255))
 
     @cached_property
-    def contrasting_shade(self) -> HSLuv:
+    def contrasting_shade(self) -> Color:
         """
         Color with a lightness that contrasts with the current color.
 
@@ -158,52 +208,52 @@ class HSLuv:
         while maintaining the same hue and saturation (so it can for example
         be used as background color).
 
-        :return: HSLuv representation of the contrasting shade
+        :return: Color representation of the contrasting shade
 
-        >>> HSLuv.from_hex("08f").contrasting_shade.hex
+        >>> Color.from_hex("08f").contrasting_shade.hex
         '001531'
-        >>> HSLuv.from_hex("0f8").contrasting_shade.hex
+        >>> Color.from_hex("0f8").contrasting_shade.hex
         '006935'
-        >>> HSLuv.from_hex("80f").contrasting_shade.hex
+        >>> Color.from_hex("80f").contrasting_shade.hex
         'ebe4ff'
-        >>> HSLuv.from_hex("8f0").contrasting_shade.hex
+        >>> Color.from_hex("8f0").contrasting_shade.hex
         '366b00'
-        >>> HSLuv.from_hex("f08").contrasting_shade.hex
+        >>> Color.from_hex("f08").contrasting_shade.hex
         '2b0012'
-        >>> HSLuv.from_hex("f80").contrasting_shade.hex
+        >>> Color.from_hex("f80").contrasting_shade.hex
         '4a2300'
         """
-        return self.copy(lightness=(self.lightness + 0.5) % 1)
+        return self.but_with(lightness=(self.lightness + 0.5) % 1)
 
     @cached_property
-    def contrasting_hue(self) -> HSLuv:
+    def contrasting_hue(self) -> Color:
         """
         Color with a hue that contrasts with the current color.
 
         Color with a 180° different hue than the current color,
         while maintaining the same saturation and perceived lightness.
 
-        :return: HSLuv representation of the contrasting hue
+        :return: Color representation of the contrasting hue
 
-        >>> HSLuv.from_hex("08f").contrasting_hue.hex
+        >>> Color.from_hex("08f").contrasting_hue.hex
         '9c8900'
-        >>> HSLuv.from_hex("0f8").contrasting_hue.hex
+        >>> Color.from_hex("0f8").contrasting_hue.hex
         'ffd1f5'
-        >>> HSLuv.from_hex("80f").contrasting_hue.hex
+        >>> Color.from_hex("80f").contrasting_hue.hex
         '5c6900'
-        >>> HSLuv.from_hex("8f0").contrasting_hue.hex
+        >>> Color.from_hex("8f0").contrasting_hue.hex
         'f6d9ff'
-        >>> HSLuv.from_hex("f08").contrasting_hue.hex
+        >>> Color.from_hex("f08").contrasting_hue.hex
         '009583'
-        >>> HSLuv.from_hex("f80").contrasting_hue.hex
+        >>> Color.from_hex("f80").contrasting_hue.hex
         '00b8d1'
         """
-        return self.relative_copy(hue=0.5)
+        return self.with_changed(hue=0.5)
 
-    def shade(self, lightness: float) -> HSLuv:
-        return self.copy(lightness=lightness)
+    def shade(self, lightness: float) -> Color:
+        return self.but_with(lightness=lightness)
 
-    def shades(self, n: int, *, inclusive: bool = False) -> Iterator[HSLuv]:
+    def shades(self, n: int, *, inclusive: bool = False) -> Iterator[Color]:
         """
         Generate n shades of this color.
 
@@ -211,9 +261,9 @@ class HSLuv:
         :param inclusive: if we want to include 0 and 1 or not
         :return: iterator of shades
 
-        >>> [c.hex for c in HSLuv.from_hex("08f").shades(5)]
+        >>> [c.hex for c in Color.from_hex("08f").shades(5)]
         ['002955', '004e97', '0076e0', '6ca2ff', 'bccfff']
-        >>> [c.hex for c in HSLuv.from_hex("08f").shades(5, inclusive=True)]
+        >>> [c.hex for c in Color.from_hex("08f").shades(5, inclusive=True)]
         ['000000', '002955', '004e97', '0076e0', '6ca2ff', 'bccfff', 'ffffff']
         """
         for lightness in fractions(n, inclusive=inclusive):
