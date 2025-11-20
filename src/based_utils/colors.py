@@ -63,6 +63,18 @@ a different set of hues (in degrees):
 ...     hues = my_hues
 """
 HUES: Hues = {
+    "red": 12,
+    "orange": 29,
+    "yellow": 68,
+    "poison": 101,
+    "green": 127,
+    "ocean": 182,
+    "blue": 244,
+    "indigo": 267,
+    "purple": 281,
+    "pink": 329,
+}
+HUES_2: Hues = {
     "red": 10,
     "orange": 35,
     "yellow": 75,
