@@ -1,10 +1,15 @@
 import os
 import sys
-from functools import cache
+from dataclasses import dataclass
+from functools import cache, cached_property
 from typing import TYPE_CHECKING
+
+from yachalk import chalk
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+
+    from based_utils.colors import Color
 
 
 @cache
@@ -45,3 +50,31 @@ white = _wrap_ansi_code(97)
 
 OK = green("✔")
 FAIL = red("✘")
+
+
+@dataclass(frozen=True)
+class Colored:
+    value: object
+    color: Color | None = None
+    background: Color | None = None
+
+    def with_color(self, color: Color) -> Colored:
+        return Colored(self.value, color, self.background)
+
+    def with_background(self, background: Color) -> Colored:
+        return Colored(self.value, self.color, background)
+
+    @cached_property
+    def formatted(self) -> str:
+        s = str(self.value)
+        if self.color:
+            s = chalk.hex(self.color.hex)(s)
+        if self.background:
+            s = chalk.bg_hex(self.background.hex)(s)
+        return s
+
+    def __repr__(self) -> str:
+        return self.formatted
+
+    def __str__(self) -> str:
+        return self.formatted

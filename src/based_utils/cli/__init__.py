@@ -1,6 +1,6 @@
 from .args import check_integer, check_integer_within_range
 from .clox import human_readable_duration, timed, timed_awaitable
-from .coloring import Colored
+from .formats import Colored
 from .logs import ConsoleHandlers, LogLevel, LogMeister
 
 __all__ = [

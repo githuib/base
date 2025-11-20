@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from functools import cached_property
-from typing import TYPE_CHECKING, ClassVar, Literal, Self, TypedDict, overload
+from typing import TYPE_CHECKING, ClassVar, Literal, Self, overload
 
 from hsluv import hex_to_hsluv, hsluv_to_hex, hsluv_to_rgb, rgb_to_hsluv
 
@@ -30,7 +30,7 @@ ColorName = Literal[
     "pink",
 ]
 
-colors: list[ColorName] = [
+COLORS: list[ColorName] = [
     "red",
     "orange",
     "yellow",
@@ -44,17 +44,7 @@ colors: list[ColorName] = [
 ]
 
 
-class Hues(TypedDict):
-    red: int
-    orange: int
-    yellow: int
-    poison: int
-    green: int
-    ocean: int
-    blue: int
-    indigo: int
-    purple: int
-    pink: int
+Hues = dict[ColorName, int]
 
 
 """
