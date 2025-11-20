@@ -5,8 +5,6 @@ from typing import TYPE_CHECKING, Literal
 if TYPE_CHECKING:
     from collections.abc import Mapping
 
-A0 = 27.5
-
 NoteName = Literal[
     "a",
     "a-sharp",
@@ -47,6 +45,8 @@ _NOTES: Mapping[NoteName, int] = {
     "a-flat": -1,
 }
 
+A0 = 27.5
+
 
 @dataclass(frozen=True)
 class Note:
@@ -58,11 +58,15 @@ class Note:
         return A0 * 2 ** (self.octave + _NOTES[self.note] / 12)
 
 
-# Piano staff ranges: G2 - A3 | E4 - F5
+# Piano staff ranges:
+#          𝄢           𝄞
+# |  |  |  |  |  .  |  |  |  |  |
+# G2          A3 C4 E4          F5
+
 INSTRUMENT_RANGES = {
     "piano": (Note("a", 0), Note("c", 7)),
     "guitar": (Note("e", 2), Note("e", 6)),  # E2 A2 D3 G3 B3 E4
-    "guitar-baritone": (Note("b", 1), Note("b", 5)),  # B1 E2 A2 D3 G3 B3
+    "guitar-baritone": (Note("b", 1), Note("b", 5)),  # B1 E2 A2 D3 F#3 B3
     "bass-guitar-4-strings": (Note("e", 1), Note("g", 4)),  # E1 A1 D2 G2
     "bass-guitar-5-strings": (Note("b", 0), Note("g", 4)),  # B0 E1 A1 D2 G2
     "cello": (Note("c", 2), Note("d", 6)),  # C2 G2 D3 A3
