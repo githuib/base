@@ -8,7 +8,6 @@ if TYPE_CHECKING:
 PRE_a = ord("a") - 1
 PRE_A = ord("A") - 1
 
-
 _ansi_regex = re.compile(r"\x1b\[\d+(;\d+)*m")
 
 

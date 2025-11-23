@@ -9,7 +9,7 @@ from based_utils.calx import randf
 from based_utils.colors import Color
 from based_utils.data.iterators import do_and_count
 
-from .formats import Colored
+from .formats import LINE_CLEAR, LINE_UP, Colored
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
@@ -26,9 +26,7 @@ def refresh_lines(lines: Lines) -> int:
 
 def clear_lines(amount: int) -> None:
     for _ in range(amount):
-        # \033[1A <-- LINE UP
-        # \x1b[2K <-- LINE CLEAR
-        sys.stdout.write("\033[1A\x1b[2K")
+        sys.stdout.write(LINE_UP + LINE_CLEAR)
 
 
 def animate[T](
