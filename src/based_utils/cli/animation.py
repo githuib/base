@@ -60,20 +60,24 @@ def animated(
     num_frames: int = None,
     min_width: int = None,
     fill_char: str = " ",
-) -> Iterator[Lines]:
-    max_width, _max_height = get_terminal_size()
-    block = list(lines)
-    block_width = max(len(line) for line in block)
-    width_ = max_width if min_width is None else min(min_width, max_width)
-    frame_0: Lines = [
-        line.ljust(block_width, fill_char).center(width_, fill_char) for line in block
-    ]
-    for i in count():
-        n = i % (num_frames or width_)
-        frame = frame_0
-        for f in frame_n:
-            frame = f(frame, n)
-        yield frame
+) -> Callable[[], Iterator[Lines]]:
+    def func() -> Iterator[Lines]:
+        max_width, _max_height = get_terminal_size()
+        block = list(lines)
+        block_width = max(len(line) for line in block)
+        width_ = max_width if min_width is None else min(min_width, max_width)
+        frame_0: Lines = [
+            line.ljust(block_width, fill_char).center(width_, fill_char)
+            for line in block
+        ]
+        for i in count():
+            n = i % (num_frames or width_)
+            frame = frame_0
+            for f in frame_n:
+                frame = f(frame, n)
+            yield frame
+
+    return func
 
 
 def moving_forward(frame_0: Lines, n: int) -> Lines:
