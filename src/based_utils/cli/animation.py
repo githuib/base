@@ -5,21 +5,16 @@ from itertools import count
 from os import get_terminal_size
 from typing import TYPE_CHECKING, cast
 
-from more_itertools import last
-
 from based_utils.calx import randf
-from based_utils.cli import Colored
 from based_utils.colors import Color
+from based_utils.data.iterators import do_and_count
+
+from .formats import Colored
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
 
 type Lines = Iterable[str]
-
-
-def do_and_count[T, R](items: Iterable[T], cb: Callable[[T], R]) -> int:
-    n, _ = last(enumerate(cb(item) for item in items))
-    return n + 1
 
 
 def refresh_lines(lines: Lines) -> int:

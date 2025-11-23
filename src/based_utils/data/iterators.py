@@ -2,13 +2,18 @@ from collections.abc import Callable
 from itertools import chain, pairwise, repeat, takewhile, tee
 from typing import TYPE_CHECKING
 
-from more_itertools import before_and_after
+from more_itertools import before_and_after, last
 
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator
 
 
 type Predicate[T] = Callable[[T], bool]
+
+
+def do_and_count[T, R](items: Iterable[T], cb: Callable[[T], R]) -> int:
+    n, _ = last(enumerate(cb(item) for item in items))
+    return n + 1
 
 
 def smart_range(start: int, stop: int, *, inclusive: bool = False) -> Iterable[int]:
