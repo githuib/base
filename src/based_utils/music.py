@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Literal
 if TYPE_CHECKING:
     from collections.abc import Mapping
 
-NoteName = Literal[
+type NoteName = Literal[
     "a",
     "a-sharp",
     "b-flat",

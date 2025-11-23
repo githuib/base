@@ -3,36 +3,37 @@ name = "based-utils"
 version = "0.6.6"
 description = "Add your description here"
 authors = [
-    { name = "Huib Piguillet", email = "huib@proton.me" }
+  { name = "Huib Piguillet", email = "huib@proton.me" }
 ]
 requires-python = ">=3.14"
 readme = "README.md"
 license = "MIT"
 keywords = [
-    "base utilities"
+  "base utilities"
 ]
 classifiers = [
-    "Intended Audience :: Developers",
-    "Topic :: Utilities",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
-    "Programming Language :: Python :: 3.14",
-    "Programming Language :: Python :: 3 :: Only",
+  "Intended Audience :: Developers",
+  "Topic :: Utilities",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: 3 :: Only",
 ]
 dependencies = [
-    "gaffe",
-    "hsluv",
-    "yachalk",
+  "gaffe",
+  "hsluv",
+  "more_itertools",
+  "yachalk",
 ]
 
 [dependency-groups]
 dev = [
-    "mypy",
-    "powerchord",
-    "pytest",
-    "pytest-asyncio",
-    "ruff",
+  "mypy",
+  "powerchord",
+  "pytest",
+  "pytest-asyncio",
+  "ruff",
 ]
 
 [project.urls]
@@ -48,10 +49,10 @@ build-backend = "uv_build"
 
 [tool.powerchord]
 tasks = [
-    "mypy",
-    "pytest",
-    "ruff check",
-#    "ruff format",
+  "mypy",
+  "pytest",
+  "ruff check",
+#  "ruff format",
 ]
 
 [tool.mypy]
@@ -70,7 +71,7 @@ addopts = "-ra --doctest-modules"  # -q
 #asyncio_default_fixture_loop_scope = "function"
 testpaths = [
   "src/based_utils",
-  #    "tests",
+  #  "tests",
 ]
 
 [tool.ruff.format]

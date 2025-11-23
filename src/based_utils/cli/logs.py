@@ -37,7 +37,7 @@ class LogLevel(IntEnum):
             raise InvalidLogLevelError(value) from exc
 
 
-ConsoleHandlers = tuple[logging.StreamHandler, logging.StreamHandler]
+type ConsoleHandlers = tuple[logging.StreamHandler, logging.StreamHandler]
 
 
 class LogMeister:

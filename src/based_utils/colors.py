@@ -17,7 +17,7 @@ class RGB:
     blue: int
 
 
-ColorName = Literal[
+type ColorName = Literal[
     "red",
     "orange",
     "yellow",
@@ -44,7 +44,7 @@ COLORS: list[ColorName] = [
 ]
 
 
-Hues = dict[ColorName, int]
+type Hues = dict[ColorName, int]
 
 
 """
