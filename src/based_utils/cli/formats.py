@@ -12,8 +12,8 @@ if TYPE_CHECKING:
     from based_utils.colors import Color
 
 
-LINE_UP = r"\033[1A"
-LINE_CLEAR = r"\x1b[2K"
+LINE_UP = "\033[1A"
+LINE_CLEAR = "\x1b[2K"
 
 
 @cache
