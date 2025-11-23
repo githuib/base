@@ -1,4 +1,4 @@
-from .animation import animate, animated
+from .animation import Lines, animate, animated
 from .args import check_integer, check_integer_within_range
 from .clox import human_readable_duration, timed, timed_awaitable
 from .formats import Colored
@@ -8,6 +8,7 @@ from .tables import format_table
 __all__ = [
     "Colored",
     "ConsoleHandlers",
+    "Lines",
     "LogLevel",
     "LogMeister",
     "animate",
