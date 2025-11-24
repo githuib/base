@@ -2,7 +2,7 @@ from functools import wraps
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterable
+    from collections.abc import Callable
 
 
 class FatalError(SystemExit):
@@ -11,12 +11,8 @@ class FatalError(SystemExit):
 
 
 def killed_by_errors[**P, T](
-    f: Callable[P, T] = None,
-    /,
-    *,
-    errors: Iterable[type[Exception]] = None,
-    unknown_message: str = None,
-) -> Callable[P, T] | Callable[[Callable[P, T]], Callable[P, T]]:
+    *errors: type[Exception], unknown_message: str = None
+) -> Callable[[Callable[P, T]], Callable[P, T]]:
     def decorator(func: Callable[P, T]) -> Callable[P, T]:
         @wraps(func)
         def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
@@ -25,13 +21,13 @@ def killed_by_errors[**P, T](
             except tuple(errors or []) as exc:
                 raise FatalError(*exc.args) from exc
             except Exception as exc:
-                raise FatalError(
-                    *([unknown_message] if unknown_message else exc.args)
-                ) from exc
+                if unknown_message:
+                    raise FatalError(unknown_message) from exc
+                raise FatalError(*exc.args) from exc
 
         return wrapper
 
-    return decorator if f is None else decorator(f)
+    return decorator
 
 
 def killed_by[E: Exception, **P, T](
