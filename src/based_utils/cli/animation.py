@@ -1,6 +1,7 @@
 import sys
 import time
 from collections.abc import Iterable
+from contextlib import suppress
 from itertools import count
 from os import get_terminal_size
 from typing import TYPE_CHECKING, cast
@@ -40,18 +41,19 @@ def animate[T](
     def fmt(item_: T) -> Lines:
         return cast("Lines", item_) if format_item is None else format_item(item_)
 
-    lines_written = 0
-    for i, item in enumerate(items):
-        yield item
-        if i % only_every_nth != 0:
-            continue
+    with suppress(KeyboardInterrupt):
+        lines_written = 0
+        for i, item in enumerate(items):
+            yield item
+            if i % only_every_nth != 0:
+                continue
 
-        clear_lines(lines_written)
-        lines_written = refresh_lines(fmt(item))
-        time.sleep(1 / fps)
+            clear_lines(lines_written)
+            lines_written = refresh_lines(fmt(item))
+            time.sleep(1 / fps)
 
-    if not keep_last:
-        clear_lines(lines_written)
+        if not keep_last:
+            clear_lines(lines_written)
 
 
 def animated(
