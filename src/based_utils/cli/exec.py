@@ -32,3 +32,35 @@ def killed_by_errors[**P, T](
         return wrapper
 
     return decorator if f is None else decorator(f)
+
+
+def killed_by[E: Exception, **P, T](
+    *errors: type[E],
+) -> Callable[[Callable[P, T]], Callable[P, T]]:
+    def decorator(func: Callable[P, T]) -> Callable[P, T]:
+        @wraps(func)
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
+            try:
+                return func(*args, **kwargs)
+            except errors as exc:
+                raise FatalError(*exc.args) from exc
+
+        return wrapper
+
+    return decorator
+
+
+def catch_unknown_errors[**P, T](
+    unknown_message: str = "Unknown error",
+) -> Callable[[Callable[P, T]], Callable[P, T]]:
+    def decorator(func: Callable[P, T]) -> Callable[P, T]:
+        @wraps(func)
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
+            try:
+                return func(*args, **kwargs)
+            except Exception as exc:
+                raise FatalError(unknown_message) from exc
+
+        return wrapper
+
+    return decorator
