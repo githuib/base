@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 
 from based_utils.cli import Colored
 from based_utils.data.iterators import filled_empty, transposed
-from based_utils.data.strings import right_justified, strlen
+from based_utils.data.strings import align_left, strlen
 
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator
@@ -49,7 +49,7 @@ def format_table(
         yield (
             left(r_)
             + "".join(
-                (t("═") * (w + 2) if r_ in (0, 2, b) else f" {right_justified(s, w)} ")
+                (t("═") * (w + 2) if r_ in (0, 2, b) else f" {align_left(s, w)} ")
                 + (
                     f"{right(r_)}  {left(r_)}"
                     if c in (column_splits or [])

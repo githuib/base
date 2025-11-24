@@ -21,17 +21,17 @@ def strlen(s: str) -> int:
     )
 
 
-def justified_left(s: str, width: int, *, fill_char: str = " ") -> str:
+def align_left(s: str, width: int, *, fill_char: str = " ") -> str:
     return s + fill_char * max(width - strlen(s), 0)
 
 
-def justified_right(s: str, width: int, *, fill_char: str = " ") -> str:
+def align_right(s: str, width: int, *, fill_char: str = " ") -> str:
     return fill_char * max(width - strlen(s), 0) + s
 
 
-def justified_center(s: str, width: int, *, fill_char: str = " ") -> str:
+def align_center(s: str, width: int, *, fill_char: str = " ") -> str:
     padding = fill_char * (max(width - strlen(s), 0) // 2)
-    return justified_left(padding + s + padding, width, fill_char=fill_char)
+    return align_left(padding + s + padding, width, fill_char=fill_char)
 
 
 def padded(lines: Iterable[str], max_length: int = None) -> Iterator[str]:
