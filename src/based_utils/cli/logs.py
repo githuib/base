@@ -27,7 +27,7 @@ class LogLevel(IntEnum):
     DEBUG = logging.DEBUG
 
     @classmethod
-    @raises(ValueError)
+    @raises(InvalidLogLevelError)
     def decode(cls, value: str) -> LogLevel:
         if not value:
             return cls.NEVER
@@ -57,6 +57,7 @@ class LogMeister:
     ) -> None:
         logger = self.get_logger(name)
         logger.setLevel(level)
+        logger.propagate = False
         for handler in handlers:
             logger.addHandler(handler)
 
