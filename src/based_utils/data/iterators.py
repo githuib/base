@@ -64,6 +64,16 @@ def first_duplicate[T](it: Iterable[T]) -> tuple[int, T]:
     raise StopIteration
 
 
+def polarized[T](
+    items: Iterable[T], predicate: Predicate[T]
+) -> tuple[list[T], list[T]]:
+    left: list[T] = []
+    right: list[T] = []
+    for item in items:
+        (left if predicate(item) else right).append(item)
+    return left, right
+
+
 def split_items[T](items: Iterable[T], *, delimiter: T = None) -> Iterator[list[T]]:
     """
     Split any iterable (not just string).
