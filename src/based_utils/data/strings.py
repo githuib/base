@@ -50,3 +50,8 @@ def split_conditional[T](
     left = [item for item in collection if condition(item)]
     right = [item for item in collection if item not in left]
     return left, right
+
+def equalize(lines: Iterable[str]) -> Iterator[str]:
+    length = max(len(line) for line in lines)
+    for line in lines:
+        yield line.ljust(length)

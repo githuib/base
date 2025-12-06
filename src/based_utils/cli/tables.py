@@ -1,8 +1,10 @@
 from itertools import zip_longest
 from typing import TYPE_CHECKING
 
+from more_itertools import transpose
+
 from based_utils.cli import Colored
-from based_utils.data.iterators import filled_empty, transposed
+from based_utils.data.iterators import filled_empty
 from based_utils.data.strings import align_left, strlen
 
 if TYPE_CHECKING:
@@ -22,7 +24,7 @@ def format_table(
     rows = list(filled_empty([[str(v) for v in tr] for tr in trs], ""))
 
     def max_columns_widths() -> Iterator[int]:
-        for col in transposed(rows):
+        for col in transpose(rows):
             yield max(strlen(s) for s in col)
 
     def column_widths() -> Iterator[int]:

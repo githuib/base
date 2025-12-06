@@ -2,13 +2,17 @@ from collections.abc import Callable
 from itertools import chain, pairwise, repeat, takewhile, tee
 from typing import TYPE_CHECKING
 
-from more_itertools import before_and_after, last
+from more_itertools import before_and_after, last, split_when, transpose
 
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator
 
 
 type Predicate[T] = Callable[[T], bool]
+
+
+def filter_non_empty[T](items: Iterable[T]) -> Iterator[T]:
+    return filter(lambda item: item, items)
 
 
 def do_and_count[T, R](items: Iterable[T], cb: Callable[[T], R]) -> int:
@@ -74,6 +78,12 @@ def polarized[T](
     return left, right
 
 
+def split_when_changed[T](
+    items: Iterable[T], predicate: Predicate[T]
+) -> Iterator[list[T]]:
+    return split_when(items, lambda x, y: not predicate(x) and predicate(y))
+
+
 def split_items[T](items: Iterable[T], *, delimiter: T = None) -> Iterator[list[T]]:
     """
     Split any iterable (not just string).
@@ -120,19 +130,14 @@ def filled_empty[T](rows: Iterable[Iterable[T]], value: T) -> Iterator[list[T]]:
         yield [*row, *([value] * (max_width - len(row)))]
 
 
-def transposed[T](rows: Iterable[Iterable[T]]) -> Iterator[list[T]]:
-    for col in zip(*rows, strict=True):
-        yield list(col)
+def rotated_cw[T](rows: Iterable[Iterable[T]]) -> Iterator[tuple[T, ...]]:
+    return reversed(list(transpose(rows)))
 
 
-def rotated_cw[T](rows: Iterable[Iterable[T]]) -> Iterator[list[T]]:
-    return reversed(list(transposed(rows)))
+def rotated_ccw[T](rows: Iterable[Iterable[T]]) -> Iterator[tuple[T, ...]]:
+    return transpose(reversed(list(rows)))
 
 
-def rotated_ccw[T](rows: Iterable[Iterable[T]]) -> Iterator[list[T]]:
-    return transposed(reversed(list(rows)))
-
-
-def transposed_lines(lines: Iterable[str]) -> Iterator[str]:
-    for col in zip(*lines, strict=True):
+def transpose_lines(lines: Iterable[str]) -> Iterator[str]:
+    for col in transpose(lines):
         yield "".join(col)
