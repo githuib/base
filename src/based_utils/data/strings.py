@@ -2,6 +2,8 @@ import re
 import unicodedata
 from typing import TYPE_CHECKING
 
+from based_utils.data.iterators import equalized
+
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator
 
@@ -34,10 +36,11 @@ def align_center(s: str, width: int, *, fill_char: str = " ") -> str:
     return align_left(padding + s + padding, width, fill_char=fill_char)
 
 
-def padded(lines: Iterable[str], max_length: int = None) -> Iterator[str]:
-    max_length = max_length or max(len(line) for line in lines)
-    for line in lines:
-        yield line.ljust(max_length)
+def equalized_lines(
+    lines: Iterable[str], *, fill_char: str = " ", max_length: int = None
+) -> Iterator[str]:
+    for foo in equalized(lines, fill_item=fill_char, max_length=max_length):
+        yield "".join(foo)
 
 
 def split_at(s: str, pos: int) -> tuple[str, str]:
@@ -50,8 +53,3 @@ def split_conditional[T](
     left = [item for item in collection if condition(item)]
     right = [item for item in collection if item not in left]
     return left, right
-
-def equalize(lines: Iterable[str]) -> Iterator[str]:
-    length = max(len(line) for line in lines)
-    for line in lines:
-        yield line.ljust(length)

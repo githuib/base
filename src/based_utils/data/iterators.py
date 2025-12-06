@@ -1,4 +1,4 @@
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from itertools import chain, pairwise, repeat, takewhile, tee
 from typing import TYPE_CHECKING
 
@@ -76,6 +76,15 @@ def polarized[T](
     for item in items:
         (left if predicate(item) else right).append(item)
     return left, right
+
+
+def equalized[T](
+    items: Iterable[Sequence[T]], *, fill_item: T = None, max_length: int = None
+) -> Iterator[list[T]]:
+    if max_length is None:
+        max_length = max(len(item) for item in items)
+    for item in items:
+        yield [*item, fill_item * max(0, max_length - len(item))]
 
 
 def split_when_changed[T](
